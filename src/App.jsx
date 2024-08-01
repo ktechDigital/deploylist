@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Checklist from "./components/ChecklistItem";
 import styled from "styled-components";
+import ResetImg from "./assets/reset.png";
+import Ktechlogo from "./assets/ktechlogo.png";
 
 const Container = styled.div`
   max-width: 100vw;
@@ -9,7 +11,15 @@ const Container = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* justify-content: center; */
   align-items: center;
+  background: rgb(208, 208, 208);
+  background: rgb(228, 228, 228);
+  background: linear-gradient(
+    -90deg,
+    rgba(228, 228, 228, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
 `;
 
 const NewItemContainer = styled.div`
@@ -22,12 +32,13 @@ const NewItemInput = styled.input`
   padding: 10px;
   border: 2px solid #da2dda;
   border-radius: 10px;
+  width: 240px;
   &:focus {
     outline-color: purple;
   }
 `;
-
 const AddButton = styled.button`
+  /* padding: 10px; */
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -40,9 +51,25 @@ const AddButton = styled.button`
   min-height: 40px;
   max-height: 40px;
   font-weight: 600;
+  margin-left: 20px;
   &:hover {
     scale: 1.04;
   }
+`;
+
+const Klogo = styled.img`
+  width: 200px;
+`;
+
+const ContainerContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  box-shadow: rgba(62, 62, 70, 0.2) 0px 7px 29px 0px;
+  border-radius: 10px;
+  padding: 10px;
 `;
 
 const Title = styled.h1`
@@ -53,8 +80,35 @@ const Title = styled.h1`
     color: purple;
   }
 `;
+const ResetButton = styled.div`
+  min-width: 40px;
+  max-width: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  background-color: purple;
+  cursor: pointer;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease; /* Usando 'all' para incluir a rotação */
+  margin-top: 10px;
 
-const App = () => {
+  img {
+    width: 100%;
+    transition: transform 0.3s ease; /* Transição suave para a transformação */
+  }
+
+  &:hover {
+    scale: 1.04;
+
+    img {
+      transform: rotate(360deg); /* Rotação de 360 graus */
+    }
+  }
+`;
+
+function App() {
   const initialItems = [
     "Criar organização",
     "Definir local",
@@ -66,7 +120,7 @@ const App = () => {
     "Atribuir divisions aos usuários",
     "Atribuir scripts de tela as filas",
     "Criar tabulações",
-    "Adicioanr tabulações as filas",
+    "Adicionar tabulações as filas",
     "Definir tempo de tabulação automática",
     "Adicionar HSM",
     "Definir permissões/funçoes",
@@ -74,32 +128,40 @@ const App = () => {
     "Homologação interna",
   ];
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => {
+    const items = JSON.parse(localStorage.getItem("items"));
+    return items.length == 0 ? initialItems : items;
+  });
   const [newItem, setNewItem] = useState("");
-
-  useEffect(() => {
-    const savedItems = JSON.parse(localStorage.getItem("checklistItems"));
-    if (savedItems) {
-      setItems(savedItems);
-    } else {
-      setItems(initialItems);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("checklistItems", JSON.stringify(items));
-  }, [items]);
+  const [vazio, setVazio] = useState(false);
 
   const addItem = () => {
     if (newItem.trim() !== "") {
       setItems([...items, newItem]);
       setNewItem("");
+    } else {
+      setVazio(true);
+      setTimeout(() => {
+        setVazio(false);
+      }, 1600);
     }
   };
 
+  useEffect(() => {
+    localStorage.setItem("items", JSON.stringify(items));
+  }, [items]);
+
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem("items"));
+    if (items) {
+      setItems(items);
+    }
+  }, []);
+
   const deleteItem = (index) => {
-    const updatedItems = items.filter((_, i) => i !== index);
-    setItems(updatedItems);
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    setItems(newItems);
   };
 
   const handleKeyPress = (e) => {
@@ -110,22 +172,38 @@ const App = () => {
 
   return (
     <Container className="App">
-      <Title>Checklist Implantação ☑</Title>
-      <Checklist items={items} deleteItem={deleteItem} />
-      <NewItemContainer style={{ marginTop: "16px" }}>
-        <NewItemInput
-          type="text"
-          value={newItem}
-          onChange={(e) => setNewItem(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="New item"
-        />
-        <AddButton onClick={addItem} style={{ marginLeft: "8px" }}>
-          +
-        </AddButton>
-      </NewItemContainer>
+      <ContainerContent>
+        <Klogo src={Ktechlogo}></Klogo>
+        <Title>
+          Checklist Implantação <strong>☑</strong>
+        </Title>
+        <Checklist items={items} onDeleteItem={deleteItem} />
+        <NewItemContainer>
+          <NewItemInput
+            type="text"
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Novo item"
+          />
+
+          <AddButton onClick={addItem}>+</AddButton>
+        </NewItemContainer>
+        <span
+          style={{ height: "10px", fontFamily: "sans-serif", fontSize: "15px" }}
+        >
+          {vazio ? "Digite o nome do item!" : " "}
+        </span>
+        <ResetButton
+          onClick={() => {
+            setItems(initialItems);
+          }}
+        >
+          <img src={ResetImg} alt="" />
+        </ResetButton>
+      </ContainerContent>
     </Container>
   );
-};
+}
 
 export default App;

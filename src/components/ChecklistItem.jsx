@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import victor from "../assets/trashcan.png";
 
 const CheckboxItem = styled.input`
   border-radius: 50%;
@@ -7,16 +8,25 @@ const CheckboxItem = styled.input`
   max-width: 20px;
   min-height: 20px;
   max-height: 20px;
+  cursor: pointer;
 `;
 
 const DeleteButton = styled.button`
-  background-color: red;
-  color: white;
   border: none;
-  border-radius: 5px;
+  background-color: #e74a4a;
+  color: white;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 5px 10px;
-  margin-left: 10px;
+  padding: 5px;
+  min-width: 30px;
+  max-width: 30px;
+  min-height: 30px;
+  max-height: 30px;
+  margin-left: 5px;
+  transition: 0.4s;
+  &:hover {
+    scale: 1.1;
+  }
 `;
 
 const ChecklistItem = ({ text, onDelete }) => {
@@ -36,27 +46,35 @@ const ChecklistItem = ({ text, onDelete }) => {
         justifyContent: "space-between",
       }}
     >
-      <span
-        style={{
-          fontFamily: "sans-serif",
-          textDecoration: isChecked ? "line-through" : "none",
-        }}
-      >
-        {text}
-      </span>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div>
+        <span
+          style={{
+            borderLeft: "2px solid purple",
+            marginLeft: "4px",
+            paddingLeft: "4px",
+            fontFamily: "sans-serif",
+            textDecoration: isChecked ? "line-through" : "none",
+            maxWidth: "200px",
+          }}
+        >
+          {text}
+        </span>
+      </div>
+      <div>
         <CheckboxItem
           type="checkbox"
           checked={isChecked}
           onChange={handleCheckboxChange}
         />
-        <DeleteButton onClick={onDelete}>Delete</DeleteButton>
+        <DeleteButton onClick={onDelete}>
+          <img style={{ width: "100%" }} src={victor} alt="" />
+        </DeleteButton>
       </div>
     </div>
   );
 };
 
-const Checklist = ({ items, deleteItem }) => {
+const Checklist = ({ items, onDeleteItem }) => {
   return (
     <div
       style={{
@@ -70,7 +88,7 @@ const Checklist = ({ items, deleteItem }) => {
         <ChecklistItem
           key={index}
           text={item}
-          onDelete={() => deleteItem(index)}
+          onDelete={() => onDeleteItem(index)}
         />
       ))}
     </div>
